@@ -1,0 +1,85 @@
+<?php
+/**
+ * 熙宇的象棋游戏v1.0
+ * 功能概要：
+ * 1.在一台电脑上对局
+ * 2.具有完整的下棋功能，走子规则判断，吃子功能，悔棋功能，保存棋谱功能，播放棋谱功能。
+ *
+ * v2.0 加入两台电脑联网对战功能
+ *
+ * v3.0 加入电脑陪玩功能
+ */
+
+define("PATH_RES","resources/");
+define("ID",0);
+include_once "include/winbinder.php";
+
+//画窗口
+$mainwin = wb_create_window(NULL, AppWindow, "xiyu's chiness chess", 0, 0, 1000, 1000, 0, 0);
+//画棋盘;
+$map_img=wb_load_image(PATH_RES.'chessdesktop.bmp');
+wb_draw_image($mainwin,$map_img,250,200);
+//画棋子
+//1.第一排坐标
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,685,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,745,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,625,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,565,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,505,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,445,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,385,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,325,215,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,265,215,40,40);
+wb_destroy_image($chesses_img);
+//2.炮
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,325,335,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,685,335,40,40);
+wb_destroy_image($chesses_img);
+//3.卒
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,265,395,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,385,395,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,505,395,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,625,395,40,40);
+wb_destroy_image($chesses_img);
+$chesses_img=wb_load_image(PATH_RES.'chesspiece.bmp');
+wb_draw_image($mainwin,$chesses_img,745,395,40,40);
+wb_destroy_image($chesses_img);
+
+
+
+wb_draw_text($mainwin,'我就是中文',30,18);
+
+wb_main_loop();
+
+
+
+
+
+?>
