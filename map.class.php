@@ -108,9 +108,33 @@ class map{
             $location=$this->get_near_location_by_coordinate($x,$y);
             if(is_array($location)) {
                 list($i, $j) = $location;
-                $chess=$this->battleground[$i][$j];
-                $target=$this->battleground[$i][$j];
-                if($this->chosen_chess instanceof chess){
+                $chess_target=$this->battleground[$i][$j];
+                if($chess_target instanceof chess){
+                    if($chess_target->color==$this->player){
+                        $this->chose_chess($chess_target,$location);
+                        wb_set_text($statusbar, '选中一个棋子,名字叫：'.$chess_target->name);
+                    }else{
+                        wb_set_text($statusbar, '你不能操作这个棋子');
+                        if($this->chosen_chess instanceof chess){
+                            wb_set_text($statusbar, '现在不允许吃子');
+                            //@todo 判断是否可以吃子
+                        }
+                    }
+                }else{
+                    wb_set_text($statusbar, '点击了无效地址');
+                    if($this->chosen_chess instanceof chess){
+                        //@todo 判断棋子是否可以移动
+                        //debug 直接走子
+                        list($i_c,$j_c)=$this->chosen_location;
+                        $this->battleground[$i_c][$j_c]=0;
+                        $this->battleground[$i][$j]=$this->chosen_chess;
+                        $this->chosen_chess=0;
+                        $this->swich_player();
+                        $this->draw_map();
+                        wb_set_text($statusbar, '移动一个棋子,移动方变为：'.$this->player);
+                    }
+                }
+/*                if($this->chosen_chess instanceof chess){
                     if($this->chosen_location==$location){
                         //重复点击同一位置，取消选择，去掉长方形
                         $this->chosen_chess=0;
@@ -131,7 +155,7 @@ class map{
                     } else {
                         wb_set_text($statusbar, '这里没有棋子');
                     }
-                }
+                }*/
             }else{
                 wb_set_text($statusbar, '点击无效');
             }
@@ -139,6 +163,7 @@ class map{
     }
 
     private function chose_chess($chess,$location){
+        $this->draw_map();
         $this->chosen_chess = $chess;
         $this->chosen_location = $location;
         list($x_s, $y_s) = $this->get_coordinate($location[0], $location[1]);
@@ -149,6 +174,9 @@ class map{
 
     }
 
+    private function swich_player(){
+        $this->player=(1+$this->player)%2;
+    }
     public function draw_rect($mainwin,$x,$y,$width,$height,$color){
         wb_draw_line($mainwin,$x,$y,$x+$width,$y,$color);
         wb_draw_line($mainwin,$x,$y,$x,$y+$width,$color);
