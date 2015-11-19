@@ -116,46 +116,22 @@ class map{
                     }else{
                         wb_set_text($statusbar, '你不能操作这个棋子');
                         if($this->chosen_chess instanceof chess){
-                            wb_set_text($statusbar, '现在不允许吃子');
-                            //@todo 判断是否可以吃子
+                            if($this->chosen_chess->killable($this,$location)){
+                                $this->kill_chess($location);
+                                wb_set_text($statusbar, '吃掉了一个棋子,移动方变为：'.$this->player);
+                            }
                         }
                     }
                 }else{
                     wb_set_text($statusbar, '点击了无效地址');
                     if($this->chosen_chess instanceof chess){
-                        //@todo 判断棋子是否可以移动
-                        //debug 直接走子
-                        list($i_c,$j_c)=$this->chosen_location;
-                        $this->battleground[$i_c][$j_c]=0;
-                        $this->battleground[$i][$j]=$this->chosen_chess;
-                        $this->chosen_chess=0;
-                        $this->swich_player();
-                        $this->draw_map();
-                        wb_set_text($statusbar, '移动一个棋子,移动方变为：'.$this->player);
+                        wb_set_text($statusbar, '你不能操作这个棋子-move');
+                        if($this->chosen_chess->moveable($this,$location)){
+                            $this->move_chess($location);
+                            wb_set_text($statusbar, '移动一个棋子,移动方变为：'.$this->player);
+                        }
                     }
                 }
-/*                if($this->chosen_chess instanceof chess){
-                    if($this->chosen_location==$location){
-                        //重复点击同一位置，取消选择，去掉长方形
-                        $this->chosen_chess=0;
-                        $this->draw_map();
-                        wb_set_text($statusbar, '没有选择新位置');
-                        return ;
-                    }
-                    //走子或者吃子
-                    list($i_c,$j_c)=$this->chosen_location;
-                    $this->battleground[$i_c][$j_c]=0;
-                    $this->battleground[$i][$j]=$this->chosen_chess;
-                    $this->chosen_chess=0;
-                    $this->draw_map();
-                }else{
-                    //选中棋子
-                    if ($chess instanceof chess) {
-                        $this->chose_chess($chess,$location);
-                    } else {
-                        wb_set_text($statusbar, '这里没有棋子');
-                    }
-                }*/
             }else{
                 wb_set_text($statusbar, '点击无效');
             }
@@ -170,8 +146,24 @@ class map{
         $this->draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF);
     }
 
-    private function kill_chess(){
+    private function move_chess($location){
+        list($i_c,$j_c)=$this->chosen_location;
+        list($i, $j) = $location;
+        $this->battleground[$i_c][$j_c]=0;
+        $this->battleground[$i][$j]=$this->chosen_chess;
+        $this->chosen_chess=0;
+        $this->swich_player();
+        $this->draw_map();
+    }
 
+    private function kill_chess($location){
+        list($i_c,$j_c)=$this->chosen_location;
+        list($i, $j) = $location;
+        $this->battleground[$i_c][$j_c]=0;
+        $this->battleground[$i][$j]=$this->chosen_chess;
+        $this->chosen_chess=0;
+        $this->swich_player();
+        $this->draw_map();
     }
 
     private function swich_player(){
@@ -184,6 +176,13 @@ class map{
         wb_draw_line($mainwin,$x,$y+$width,$x+$width,$y+$width,$color);
     }
 
+    public function __get($property){
+        if(isset($this->$property)){
+            return $this->$property;
+        }else{
+            return NULL;
+        }
+    }
 
 }
 
