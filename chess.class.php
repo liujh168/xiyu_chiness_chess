@@ -65,7 +65,7 @@ class chess{
     }
 
     //黑将移动规则
-    public function moveable_0_0($map,$location){
+    private function moveable_0_0($map,$location){
         $moveable_location=array(
             array(3,0),array(4,0),array(5,0),
             array(3,1),array(4,1),array(5,1),
@@ -83,7 +83,7 @@ class chess{
     }
 
     //黑士移动规则
-    public function moveable_0_1($map,$location){
+    private function moveable_0_1($map,$location){
         $moveable_location=array(
             array(3,0),            array(5,0),
                         array(4,1),
@@ -101,7 +101,7 @@ class chess{
     }
 
     //黑象移动规则
-    public function moveable_0_2($map,$location){
+    private function moveable_0_2($map,$location){
         $moveable_location=array(
             array(2,0),            array(6,0),
             array(0,2), array(4,2),array(8,2),
@@ -125,7 +125,7 @@ class chess{
     }
 
     //黑卒移动规则
-    public function moveable_0_6($map,$location){
+    private function moveable_0_6($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
         $diff_y=abs($location[1]-$pre_location[1]);
@@ -142,7 +142,7 @@ class chess{
     }
 
     //红帅移动规则
-    public function moveable_1_0($map,$location){
+    private function moveable_1_0($map,$location){
         $moveable_location=array(
             array(3,7),array(4,7),array(5,7),
             array(3,8),array(4,8),array(5,8),
@@ -160,7 +160,7 @@ class chess{
     }
 
     //红士移动规则
-    public function moveable_1_1($map,$location){
+    private function moveable_1_1($map,$location){
         $moveable_location=array(
             array(3,7),            array(5,7),
                          array(4,8),
@@ -178,7 +178,7 @@ class chess{
     }
 
     //红相移动规则
-    public function moveable_1_2($map,$location){
+    private function moveable_1_2($map,$location){
         $moveable_location=array(
             array(2,5),            array(6,5),
             array(0,7), array(4,7),array(8,7),
@@ -202,7 +202,7 @@ class chess{
     }
 
     //红兵移动规则
-    public function moveable_1_6($map,$location){
+    private function moveable_1_6($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
         $diff_y=abs($location[1]-$pre_location[1]);
@@ -219,7 +219,7 @@ class chess{
     }
 
     //马移动规则
-    public function moveable_3($map,$location){
+    private function moveable_3($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
         $diff_y=abs($location[1]-$pre_location[1]);
@@ -240,7 +240,7 @@ class chess{
     }
 
     //車炮移动规则
-    public function moveable_4($map,$location){
+    private function moveable_4($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
         $diff_y=abs($location[1]-$pre_location[1]);
@@ -291,7 +291,7 @@ class chess{
     }
 
     //炮的吃子规则
-    public function killable_5($map,$location){
+    private function killable_5($map,$location){
         $bridge=false;
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
@@ -315,7 +315,7 @@ class chess{
     }
 
     //将帅的吃子规则
-    public function killable_0($map,$location){
+    private function killable_0($map,$location){
         $move_function='moveable_'.$this->color.'_0';
         if($this->$move_function($map,$location)){
             return true;

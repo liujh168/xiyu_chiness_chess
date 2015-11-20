@@ -4,6 +4,10 @@
  * 功能概要：
  * 1.在一台电脑上对局
  * 2.具有完整的下棋功能，走子规则判断，吃子功能，悔棋功能，保存棋谱功能，播放棋谱功能。
+ * 3.缩小后恢复，图像消失问题
+ * 4.游戏结束时，弹框选择重玩还是保存棋谱。棋子不能再被操作
+ * 5.菜单，重玩、悔棋、保存
+ * 6.主窗口有悔棋按钮
  *
  * v2.0 加入两台电脑联网对战功能
  *
@@ -24,7 +28,7 @@ $map=new map($mainwin);
 
 
 wb_set_handler($mainwin, "process_main");
-wb_set_text($statusbar,'hello wrod。。cccccccccczzzzzzzzzzzzzzzzzkkkkkkkkkkkpppppppppppppppqqqqqqqqqqqqqqqqqqqqqqqyyyyyyyyyyyyyyyyyyyy');
+wb_set_text($statusbar,'hello wrod。。');
 
 wb_main_loop();
 
@@ -42,46 +46,15 @@ function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
     global $map;
 
     switch($id) {
-
         case IDDEFAULT:			// This is the main window
-
-            $str = "";
-            if($lparam & WBC_LBUTTON)
-                $str .= "WBC_LBUTTON ";
-            if($lparam & WBC_RBUTTON)
-                $str .= "WBC_RBUTTON ";
-            if($lparam & WBC_ALT)
-                $str .= "WBC_ALT ";
-            if($lparam & WBC_CONTROL)
-                $str .= "WBC_CONTROL ";
-            if($lparam & WBC_SHIFT)
-                $str .= "WBC_SHIFT ";
-            if($lparam & WBC_DBLCLICK)
-                $str .= "WBC_DBLCLICK ";
-            if($lparam & WBC_MOUSEDOWN)
-                $str .= "WBC_MOUSEDOWN ";
-            if($lparam & WBC_MOUSEUP)
-                $str .= "WBC_MOUSEUP ";
             //鼠标所在的位置
             $x = $lparam2 & 0xFFFF;
             $y = ($lparam2 & 0xFFFF0000) >> 16;
-
-            wb_set_text($statusbar, WBC_MOUSEDOWN."你当前的坐标是$x 。$y 。$lparam2 。$lparam 。$ctrl 。$id");
-
+//            wb_set_text($statusbar, WBC_MOUSEDOWN."你当前的坐标是$x 。$y 。$lparam2 。$lparam 。$ctrl 。$id");
             //鼠标左键点击
             if($lparam==513){
+                $map->draw_map();
                 $map->click($x,$y);
-            }
-
-            $color = BLACK;
-            if(($lparam & WBC_LBUTTON))
-                $color = DARKGREEN;
-            if(($lparam & WBC_RBUTTON))
-                $color |= DARKRED;
-
-            if(($lparam & (WBC_LBUTTON | WBC_RBUTTON))) {
-//                wb_draw_rect($window, $x - 2, $y - 2, 5, 5, $color, TRUE);
-//                wb_draw_point($window, $x, $y, WHITE);
             }
             break;
 

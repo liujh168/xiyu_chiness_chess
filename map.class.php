@@ -159,17 +159,22 @@ class map{
     private function kill_chess($location){
         list($i_c,$j_c)=$this->chosen_location;
         list($i, $j) = $location;
+        $ghost=$this->battleground[$i][$j];
         $this->battleground[$i_c][$j_c]=0;
         $this->battleground[$i][$j]=$this->chosen_chess;
         $this->chosen_chess=0;
-        $this->swich_player();
         $this->draw_map();
+        if(0==$ghost->token ){
+            $winner=(1==$this->player)?'红方':'黑方';
+            wb_message_box($this->mainwin, "游戏结束，$winner 胜",'游戏结束啦');
+        }
+        $this->swich_player();
     }
 
     private function swich_player(){
         $this->player=(1+$this->player)%2;
     }
-    public function draw_rect($mainwin,$x,$y,$width,$height,$color){
+    private function draw_rect($mainwin,$x,$y,$width,$height,$color){
         wb_draw_line($mainwin,$x,$y,$x+$width,$y,$color);
         wb_draw_line($mainwin,$x,$y,$x,$y+$width,$color);
         wb_draw_line($mainwin,$x+$width,$y,$x+$width,$y+$width,$color);
