@@ -1,24 +1,24 @@
 <?php
 /**
- * ÎõÓîµÄÏóÆåÓÎÏ·v1.0
- * ¹¦ÄÜ¸ÅÒª£º
- * 1.ÔÚÒ»Ì¨µçÄÔÉÏ¶Ô¾Ö
- * 2.¾ßÓÐÍêÕûµÄÏÂÆå¹¦ÄÜ£¬×ß×Ó¹æÔòÅÐ¶Ï£¬³Ô×Ó¹¦ÄÜ£¬»ÚÆå¹¦ÄÜ£¬±£´æÆåÆ×¹¦ÄÜ£¬²¥·ÅÆåÆ×¹¦ÄÜ¡£
- * 3.ËõÐ¡ºó»Ö¸´£¬Í¼ÏñÏûÊ§ÎÊÌâ
- * 4.ÓÎÏ·½áÊøÊ±£¬µ¯¿òÑ¡ÔñÖØÍæ»¹ÊÇ±£´æÆåÆ×¡£Æå×Ó²»ÄÜÔÙ±»²Ù×÷
- * 5.²Ëµ¥£¬ÖØÍæ¡¢»ÚÆå¡¢±£´æ
- * 6.Ö÷´°¿ÚÓÐ»ÚÆå°´Å¥
+ * ç†™å®‡çš„è±¡æ£‹æ¸¸æˆv1.0
+ * åŠŸèƒ½æ¦‚è¦ï¼š
+ * 1.åœ¨ä¸€å°ç”µè„‘ä¸Šå¯¹å±€
+ * 2.å…·æœ‰å®Œæ•´çš„ä¸‹æ£‹åŠŸèƒ½ï¼Œèµ°å­è§„åˆ™åˆ¤æ–­ï¼Œåƒå­åŠŸèƒ½ï¼Œæ‚”æ£‹åŠŸèƒ½ï¼Œä¿å­˜æ£‹è°±åŠŸèƒ½ï¼Œæ’­æ”¾æ£‹è°±åŠŸèƒ½ã€‚
+ * 3.ç¼©å°åŽæ¢å¤ï¼Œå›¾åƒæ¶ˆå¤±é—®é¢˜
+ * 4.æ¸¸æˆç»“æŸæ—¶ï¼Œå¼¹æ¡†é€‰æ‹©é‡çŽ©è¿˜æ˜¯ä¿å­˜æ£‹è°±ã€‚æ£‹å­ä¸èƒ½å†è¢«æ“ä½œ
+ * 5.èœå•ï¼Œé‡çŽ©ã€æ‚”æ£‹ã€ä¿å­˜
+ * 6.ä¸»çª—å£æœ‰æ‚”æ£‹æŒ‰é’®
  *
- * v2.0 ¼ÓÈëÁ½Ì¨µçÄÔÁªÍø¶ÔÕ½¹¦ÄÜ
+ * v2.0 åŠ å…¥ä¸¤å°ç”µè„‘è”ç½‘å¯¹æˆ˜åŠŸèƒ½ï¼ŒèŠå¤©åŠŸèƒ½ã€‚
  *
- * v3.0 ¼ÓÈëµçÄÔÅãÍæ¹¦ÄÜ
+ * v3.0 åŠ å…¥ç”µè„‘é™ªçŽ©åŠŸèƒ½
  */
 
 define("PATH_RES","resources/");
 define("ID",0);
 include_once "include/winbinder.php";
 
-//»­´°¿Ú
+//ç”»çª—å£
 $mainwin = wb_create_window(NULL, AppWindow, "xiyu's chiness chess", 0, 0, 1000, 1000, WBC_NOTIFY, WBC_DBLCLICK | WBC_MOUSEDOWN | WBC_MOUSEUP | WBC_MOUSEMOVE);
 include_once "map.class.php";
 $statusbar = wb_create_control($mainwin, StatusBar, "");
@@ -28,7 +28,7 @@ $map=new map($mainwin);
 
 
 wb_set_handler($mainwin, "process_main");
-wb_set_text($statusbar,'hello wrod¡£¡£');
+wb_set_text($statusbar,'hello wrodã€‚ã€‚');
 
 wb_main_loop();
 
@@ -37,7 +37,7 @@ wb_main_loop();
  * @param $window
  * @param $id
  * @param int $ctrl
- * @param int $lparam  Êó±ê¶¯×÷ 128:ÒÆ¶¯ 129:×ó¼üÍÏ×§ 130:ÓÒ¼üÍÏ×§  257:×ó¼ü°´ÏÂ 258£ºÓÒ¼üµã»÷ 513:×ó¼ü°´ÏÂºó»Ö¸´ 514£ºÓÒ¼ü°´ÏÂºó»Ö¸´ 65£º×ó¼üË«»÷ 66£ºÓÒ¼üË«»÷
+ * @param int $lparam  é¼ æ ‡åŠ¨ä½œ 128:ç§»åŠ¨ 129:å·¦é”®æ‹–æ‹½ 130:å³é”®æ‹–æ‹½  257:å·¦é”®æŒ‰ä¸‹ 258ï¼šå³é”®ç‚¹å‡» 513:å·¦é”®æŒ‰ä¸‹åŽæ¢å¤ 514ï¼šå³é”®æŒ‰ä¸‹åŽæ¢å¤ 65ï¼šå·¦é”®åŒå‡» 66ï¼šå³é”®åŒå‡»
  * @param int $lparam2
  */
 function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
@@ -47,11 +47,11 @@ function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
 
     switch($id) {
         case IDDEFAULT:			// This is the main window
-            //Êó±êËùÔÚµÄÎ»ÖÃ
+            //é¼ æ ‡æ‰€åœ¨çš„ä½ç½®
             $x = $lparam2 & 0xFFFF;
             $y = ($lparam2 & 0xFFFF0000) >> 16;
-//            wb_set_text($statusbar, WBC_MOUSEDOWN."Äãµ±Ç°µÄ×ø±êÊÇ$x ¡£$y ¡£$lparam2 ¡£$lparam ¡£$ctrl ¡£$id");
-            //Êó±ê×ó¼üµã»÷
+//            wb_set_text($statusbar, WBC_MOUSEDOWN."ä½ å½“å‰çš„åæ ‡æ˜¯$x ã€‚$y ã€‚$lparam2 ã€‚$lparam ã€‚$ctrl ã€‚$id");
+            //é¼ æ ‡å·¦é”®ç‚¹å‡»
             if($lparam==513){
                 $map->draw_map();
                 $map->click($x,$y);
