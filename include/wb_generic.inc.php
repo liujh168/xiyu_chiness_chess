@@ -2,10 +2,10 @@
 
 /*******************************************************************************
 
- WINBINDER - A native Windows binding for PHP
+ WINBINDER - The native Windows binding for PHP for PHP
 
- Copyright © 2004-2006 Hypervisual - see LICENSE.TXT for details
- Author: Rubem Pechansky (http://www.hypervisual.com/winbinder/contact.php)
+ Copyright © Hypervisual - see LICENSE.TXT for details
+ Author: Rubem Pechansky (http://winbinder.org/contact.php)
 
  General-purpose supporting functions
 

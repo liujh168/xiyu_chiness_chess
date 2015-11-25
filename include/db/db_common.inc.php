@@ -1,9 +1,9 @@
 <?php
 
 /**
-* WINBINDER - A native Windows binding for PHP
+* WINBINDER - The native Windows binding for PHP for PHP
 *
-* Copyright © 2005-2006 Hypervisual - see LICENSE.TXT for details
+* Copyright © Hypervisual - see LICENSE.TXT for details
 * Authors: Rubem Pechansky and Hans Rebel
 *
 * Database wrapper functions for WinBinder

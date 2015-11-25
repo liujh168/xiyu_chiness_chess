@@ -2,10 +2,10 @@
 
 /*******************************************************************************
 
- WINBINDER - A native Windows binding for PHP
+ WINBINDER - The native Windows binding for PHP for PHP
 
- Copyright © 2004-2006 Hypervisual - see LICENSE.TXT for details
- Author: Rubem Pechansky (http://www.hypervisual.com/winbinder/contact.php)
+ Copyright © Hypervisual - see LICENSE.TXT for details
+ Author: Rubem Pechansky (http://winbinder.org/contact.php)
 
  Windows functions
 
@@ -57,6 +57,28 @@ function wb_create_control($parent, $class, $caption="", $xpos=0, $ypos=0, $widt
 		case HyperLink:
 			return wbtemp_create_control($parent, $class, $caption, $xpos, $ypos, $width, $height, $id, $style,
 			  is_null($lparam) ? NOCOLOR : $lparam, $ntab);
+
+		case ComboBox:
+		case ListBox:
+		case ListView:
+			$ctrl = wbtemp_create_control($parent, $class, $caption, $xpos, $ypos, $width, $height, $id, $style, $lparam, $ntab);
+			if(is_array($caption))
+				wb_set_text($ctrl, $caption[0]);
+			return $ctrl;
+
+		case TreeView:
+			$ctrl = wbtemp_create_control($parent, $class, $caption, $xpos, $ypos, $width, $height, $id, $style, $lparam, $ntab);
+			if(is_array($caption))
+				wb_set_text($ctrl, $caption[0]);
+			return $ctrl;
+
+		case Gauge:
+		case Slider:
+		case ScrollBar:
+			$ctrl = wbtemp_create_control($parent, $class, $caption, $xpos, $ypos, $width, $height, $id, $style, $lparam, $ntab);
+			if($lparam)
+				wb_set_value($ctrl, $lparam);
+			return $ctrl;
 
 		default:
 			return wbtemp_create_control($parent, $class, $caption, $xpos, $ypos, $width, $height, $id, $style, $lparam, $ntab);
@@ -163,9 +185,19 @@ function wb_get_text($ctrl, $item=null, $subitem=null)
 			}
 		}
 
-	} else
+	} elseif(wb_get_class($ctrl) == ComboBox) {
 
-		return wbtemp_get_text($ctrl);
+		return wbtemp_get_text($ctrl, $item === null ? -1 : $item);
+
+	} elseif(wb_get_class($ctrl) == ListBox) {
+
+		return wbtemp_get_text($ctrl, $item === null ? -1 : $item);
+
+	} else {
+
+		return wbtemp_get_text($ctrl, $item);
+
+	}
 }
 
 /*
@@ -220,17 +252,19 @@ function wb_set_text($ctrl, $text, $item=null, $subitem=null)
 					wbtemp_clear_listview_columns($ctrl);
 
 					// Create column headers
-					// In the loop below, passing -1 as the last argument of wbtemp_create_listview_column()
+					// In the loop below, passing -1 as the 'width' argument of wbtemp_create_listview_column()
 					// makes it calculate the column width automatically
 
 					for($i = 0; $i < count($text); $i++) {
 						if(is_array($text[$i]))
 							wbtemp_create_listview_column($ctrl, $i,
 							  (string)$text[$i][0],
-							  isset($text[$i][1]) ? (int)$text[$i][1] : -1);
+							  isset($text[$i][1]) ? (int)$text[$i][1] : -1,
+							  isset($text[$i][2]) ? (int)$text[$i][2] : WBC_LEFT
+							  );
 						else
 							wbtemp_create_listview_column($ctrl, $i,
-							  (string)$text[$i], -1);
+							  (string)$text[$i], -1, 0);
 					}
 				}
 			}
@@ -288,11 +322,12 @@ function wb_set_text($ctrl, $text, $item=null, $subitem=null)
 				return wb_create_items($ctrl, $text, true);
 
 		default:
+			// The (string) cast below works well but is a temporary fix, must be
+			// removed when wbtemp_set_text() accepts numeric types correctly
 			if(is_array($text))
-				return null;
-			$text = str_replace("\r", "", (string)$text);
-			$text = str_replace("\n", "\r\n", $text);
-			return wbtemp_set_text($ctrl, $text, $item);
+				return wbtemp_set_text($ctrl, $text, $item);
+			else
+				return wbtemp_set_text($ctrl, (string)$text, $item);
 	}
 }
 
@@ -398,20 +433,20 @@ function wb_create_items($ctrl, $items, $clear=false, $param=null)
 			$ret = array();
 			for($i = 0; $i < count($items); $i++) {
 				$ret[] = wbtemp_create_treeview_item($ctrl,
-				  (string)$items[$i][0],	// Name
-				  isset($items[$i][1]) ? $items[$i][1] : 0,			// Value
-				  isset($items[$i][2]) ? $items[$i][2] : 0,			// Where
-				  isset($items[$i][3]) ? $items[$i][3] : -1,			// ImageIndex
-				  isset($items[$i][4]) ? $items[$i][4] : -1,			// SelectedImageIndex
-				  isset($items[$i][5]) ? $items[$i][5] : 0			// InsertionType
+				  (string)$items[$i][0],						// Name
+				  isset($items[$i][1]) ? $items[$i][1] : 0,		// Value
+				  isset($items[$i][2]) ? $items[$i][2] : 0,		// Where
+				  isset($items[$i][3]) ? $items[$i][3] : -1,	// ImageIndex
+				  isset($items[$i][4]) ? $items[$i][4] : -1,	// SelectedImageIndex
+				  isset($items[$i][5]) ? $items[$i][5] : 0		// InsertionType
 				);
 			}
 			return (count($ret) > 1 ? $ret : $ret[0]);
 			break;
 
-/*		case ListBox:
-		case ComboBox:
-			return wb_set_text($ctrl, $items, false);*/
+		case StatusBar:
+			wbtemp_create_statusbar_items($ctrl, $items, $clear, $param);
+			return true;
 
 		default:
 
