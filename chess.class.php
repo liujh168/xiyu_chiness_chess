@@ -1,10 +1,10 @@
 <?php
 class chess{
-    private $color; //0=>black£¬1=>read
+    private $color; //0=>blackï¼Œ1=>read
     private $token;
     private $image;
     private $name;
-    private $token_to_name=array(0=>'½«/Ë§',1=>'Ê¿/ÊË',2=>'Ïó/Ïà',3=>'Âí',4=>'Ü‡',5=>'ÅÚ',6=>'×ä/±ø');
+    private $token_to_name=array(0=>'å°†/å¸…',1=>'å£«/ä»•',2=>'è±¡/ç›¸',3=>'é©¬',4=>'è»Š',5=>'ç‚®',6=>'å’/å…µ');
 
     public function __construct($color,$token){
         $this->color=$color;
@@ -64,7 +64,7 @@ class chess{
         return $res;
     }
 
-    //ºÚ½«ÒÆ¶¯¹æÔò
+    //é»‘å°†ç§»åŠ¨è§„åˆ™
     private function moveable_0_0($map,$location){
         $moveable_location=array(
             array(3,0),array(4,0),array(5,0),
@@ -82,7 +82,7 @@ class chess{
         }
     }
 
-    //ºÚÊ¿ÒÆ¶¯¹æÔò
+    //é»‘å£«ç§»åŠ¨è§„åˆ™
     private function moveable_0_1($map,$location){
         $moveable_location=array(
             array(3,0),            array(5,0),
@@ -100,7 +100,7 @@ class chess{
         }
     }
 
-    //ºÚÏóÒÆ¶¯¹æÔò
+    //é»‘è±¡ç§»åŠ¨è§„åˆ™
     private function moveable_0_2($map,$location){
         $moveable_location=array(
             array(2,0),            array(6,0),
@@ -124,7 +124,7 @@ class chess{
         }
     }
 
-    //ºÚ×äÒÆ¶¯¹æÔò
+    //é»‘å’ç§»åŠ¨è§„åˆ™
     private function moveable_0_6($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
@@ -141,7 +141,7 @@ class chess{
         return true;
     }
 
-    //ºìË§ÒÆ¶¯¹æÔò
+    //çº¢å¸…ç§»åŠ¨è§„åˆ™
     private function moveable_1_0($map,$location){
         $moveable_location=array(
             array(3,7),array(4,7),array(5,7),
@@ -159,7 +159,7 @@ class chess{
         }
     }
 
-    //ºìÊ¿ÒÆ¶¯¹æÔò
+    //çº¢å£«ç§»åŠ¨è§„åˆ™
     private function moveable_1_1($map,$location){
         $moveable_location=array(
             array(3,7),            array(5,7),
@@ -177,7 +177,7 @@ class chess{
         }
     }
 
-    //ºìÏàÒÆ¶¯¹æÔò
+    //çº¢ç›¸ç§»åŠ¨è§„åˆ™
     private function moveable_1_2($map,$location){
         $moveable_location=array(
             array(2,5),            array(6,5),
@@ -201,7 +201,7 @@ class chess{
         }
     }
 
-    //ºì±øÒÆ¶¯¹æÔò
+    //çº¢å…µç§»åŠ¨è§„åˆ™
     private function moveable_1_6($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
@@ -218,7 +218,7 @@ class chess{
         return true;
     }
 
-    //ÂíÒÆ¶¯¹æÔò
+    //é©¬ç§»åŠ¨è§„åˆ™
     private function moveable_3($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
@@ -239,7 +239,7 @@ class chess{
         }
     }
 
-    //Ü‡ÅÚÒÆ¶¯¹æÔò
+    //è»Šç‚®ç§»åŠ¨è§„åˆ™
     private function moveable_4($map,$location){
         $pre_location=$map->chosen_location;
         $diff_x=abs($location[0]-$pre_location[0]);
@@ -258,7 +258,7 @@ class chess{
         return true;
     }
 
-    //ÅÐ¶ÏÊÇ·ñ¿ÉÒÔ³Ô×Ó
+    //åˆ¤æ–­æ˜¯å¦å¯ä»¥åƒå­
     public function killable($map,$location){
         $flag=$this->color.'_'.$this->token;
         $function_name_common='killable_'.$this->token;
@@ -272,7 +272,7 @@ class chess{
             case '1_1':
             case '1_2':
             case '1_6':
-                $res=$this->$function_name_moveable($map,$location);    //¿É×ß¾Í¿ÉÒÔ³Ô
+                $res=$this->$function_name_moveable($map,$location);    //å¯èµ°å°±å¯ä»¥åƒ
                 break;
             case '0_3':
             case '0_4':
@@ -290,7 +290,7 @@ class chess{
         return $res;
     }
 
-    //ÅÚµÄ³Ô×Ó¹æÔò
+    //ç‚®çš„åƒå­è§„åˆ™
     private function killable_5($map,$location){
         $bridge=false;
         $pre_location=$map->chosen_location;
@@ -314,7 +314,7 @@ class chess{
         return $bridge;
     }
 
-    //½«Ë§µÄ³Ô×Ó¹æÔò
+    //å°†å¸…çš„åƒå­è§„åˆ™
     private function killable_0($map,$location){
         $move_function='moveable_'.$this->color.'_0';
         if($this->$move_function($map,$location)){

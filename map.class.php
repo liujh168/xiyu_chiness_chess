@@ -7,13 +7,17 @@ class map{
     private $chosen_chess=0;
     private $chosen_location=array();
     private $mainwin;
-    private $player;    //×ß×Ó·½£¬0=>black£¬1=>read
+    private $player;    //èµ°å­æ–¹ï¼Œ0=>blackï¼Œ1=>read
 
     public function __construct($mainwin){
+        global $win_heigh;
+        global $win_width;
+        $this->map_y_start=($win_heigh>600)?(($win_heigh-600)/2):0;
+        $this->map_x_start=($win_width>600)?(($win_width-600)/2):0;
         $this->mainwin=$mainwin;
         $this->player=1;
         $this->battleground=array_fill(0,9,array_fill(0,10,0));
-        //³õÊ¼»¯Æå×Ó
+        //åˆå§‹åŒ–æ£‹å­
         $this->battleground[0][0]=new chess(0,4);
         $this->battleground[1][0]=new chess(0,3);
         $this->battleground[2][0]=new chess(0,2);
@@ -52,11 +56,11 @@ class map{
     }
 
     public function draw_map(){
-        //1.»­ÆåÅÌ
+        //1.ç”»æ£‹ç›˜
         $map_img=wb_load_image(PATH_RES.'chessdesktop.bmp');
         wb_draw_image($this->mainwin,$map_img,$this->map_x_start,$this->map_y_start);
         wb_destroy_image($map_img);
-        //2.»­Æå×Ó
+        //2.ç”»æ£‹å­
         foreach($this->battleground as $key1=>$value1){
             foreach($value1 as $key2=>$value2){
                 if($value2 instanceof chess){
@@ -112,28 +116,28 @@ class map{
                 if($chess_target instanceof chess){
                     if($chess_target->color==$this->player){
                         $this->chose_chess($chess_target,$location);
-                        wb_set_text($statusbar, 'Ñ¡ÖÐÒ»¸öÆå×Ó,Ãû×Ö½Ð£º'.$chess_target->name);
+                        wb_set_text($statusbar, 'é€‰ä¸­ä¸€ä¸ªæ£‹å­,åå­—å«ï¼š'.$chess_target->name);
                     }else{
-                        wb_set_text($statusbar, 'Äã²»ÄÜ²Ù×÷Õâ¸öÆå×Ó');
+                        wb_set_text($statusbar, 'ä½ ä¸èƒ½æ“ä½œè¿™ä¸ªæ£‹å­');
                         if($this->chosen_chess instanceof chess){
                             if($this->chosen_chess->killable($this,$location)){
                                 $this->kill_chess($location);
-                                wb_set_text($statusbar, '³ÔµôÁËÒ»¸öÆå×Ó,ÒÆ¶¯·½±äÎª£º'.$this->player);
+                                wb_set_text($statusbar, 'åƒæŽ‰äº†ä¸€ä¸ªæ£‹å­,ç§»åŠ¨æ–¹å˜ä¸ºï¼š'.$this->player);
                             }
                         }
                     }
                 }else{
-                    wb_set_text($statusbar, 'µã»÷ÁËÎÞÐ§µØÖ·');
+                    wb_set_text($statusbar, 'ç‚¹å‡»äº†æ— æ•ˆåœ°å€');
                     if($this->chosen_chess instanceof chess){
-                        wb_set_text($statusbar, 'Äã²»ÄÜ²Ù×÷Õâ¸öÆå×Ó-move');
+                        wb_set_text($statusbar, 'ä½ ä¸èƒ½æ“ä½œè¿™ä¸ªæ£‹å­-move');
                         if($this->chosen_chess->moveable($this,$location)){
                             $this->move_chess($location);
-                            wb_set_text($statusbar, 'ÒÆ¶¯Ò»¸öÆå×Ó,ÒÆ¶¯·½±äÎª£º'.$this->player);
+                            wb_set_text($statusbar, 'ç§»åŠ¨ä¸€ä¸ªæ£‹å­,ç§»åŠ¨æ–¹å˜ä¸ºï¼š'.$this->player);
                         }
                     }
                 }
             }else{
-                wb_set_text($statusbar, 'µã»÷ÎÞÐ§');
+                wb_set_text($statusbar, 'ç‚¹å‡»æ— æ•ˆ');
             }
         }
     }
@@ -165,8 +169,8 @@ class map{
         $this->chosen_chess=0;
         $this->draw_map();
         if(0==$ghost->token ){
-            $winner=(1==$this->player)?'ºì·½':'ºÚ·½';
-            wb_message_box($this->mainwin, "ÓÎÏ·½áÊø£¬$winner Ê¤",'ÓÎÏ·½áÊøÀ²');
+            $winner=(1==$this->player)?'çº¢æ–¹':'é»‘æ–¹';
+            wb_message_box($this->mainwin, "æ¸¸æˆç»“æŸï¼Œ$winner èƒœ",'æ¸¸æˆç»“æŸå•¦');
         }
         $this->swich_player();
     }
