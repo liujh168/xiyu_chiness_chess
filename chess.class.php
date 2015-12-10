@@ -4,13 +4,16 @@ class chess{
     private $token;
     private $image;
     private $name;
-    private $token_to_name=array(0=>'将/帅',1=>'士/仕',2=>'象/相',3=>'马',4=>'車',5=>'炮',6=>'卒/兵');
+    private $token_to_name=array(
+        array(0=>'将',1=>'士',2=>'象',3=>'马',4=>'车',5=>'炮',6=>'卒'),
+        array(0=>'帅',1=>'仕',2=>'相',3=>'马',4=>'车',5=>'炮',6=>'兵')
+    );
 
     public function __construct($color,$token){
         $this->color=$color;
         $this->token=$token;
         $this->image=$this->get_image_name();
-        $this->name=$this->token_to_name[$token];
+        $this->name=$this->token_to_name[$color][$token];
     }
 
     private function get_image_name(){

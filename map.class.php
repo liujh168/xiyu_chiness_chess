@@ -6,13 +6,21 @@ class map{
     private $map_y_start=200;
     private $chosen_chess=0;
     private $chosen_location=array();
+    private $log=array();
     private $mainwin;
     private $player;    //走子方，0=>black，1=>read
+    private $starting=false;
 
+    public function restart(){
+        $this->chosen_chess=0;
+        $this->chosen_location=array();
+        $this->starting=false;
+        $this->__construct($this->mainwin);
+    }
     public function __construct($mainwin){
         global $win_heigh;
         global $win_width;
-        $this->map_y_start=($win_heigh>600)?(($win_heigh-600)/2):0;
+        $this->map_y_start=($win_heigh>600)?(($win_heigh-600)/3):0;
         $this->map_x_start=($win_width>600)?(($win_width-600)/2):0;
         $this->mainwin=$mainwin;
         $this->player=1;
@@ -26,7 +34,6 @@ class map{
         $this->battleground[5][0]=new chess(0,1);
         $this->battleground[6][0]=new chess(0,2);
         $this->battleground[7][0]=new chess(0,3);
-        $this->battleground[8][0]=new chess(0,4);
         $this->battleground[8][0]=new chess(0,4);
         $this->battleground[1][2]=new chess(0,5);
         $this->battleground[7][2]=new chess(0,5);
@@ -43,7 +50,6 @@ class map{
         $this->battleground[5][9]=new chess(1,1);
         $this->battleground[6][9]=new chess(1,2);
         $this->battleground[7][9]=new chess(1,3);
-        $this->battleground[8][9]=new chess(1,4);
         $this->battleground[8][9]=new chess(1,4);
         $this->battleground[1][7]=new chess(1,5);
         $this->battleground[7][7]=new chess(1,5);
@@ -151,6 +157,7 @@ class map{
     }
 
     private function move_chess($location){
+        $this->add_log($this->chosen_chess,$this->chosen_location,$location);
         list($i_c,$j_c)=$this->chosen_location;
         list($i, $j) = $location;
         $this->battleground[$i_c][$j_c]=0;
@@ -161,6 +168,7 @@ class map{
     }
 
     private function kill_chess($location){
+        $this->add_log($this->chosen_chess,$this->chosen_location,$location);
         list($i_c,$j_c)=$this->chosen_location;
         list($i, $j) = $location;
         $ghost=$this->battleground[$i][$j];
@@ -169,20 +177,28 @@ class map{
         $this->chosen_chess=0;
         $this->draw_map();
         if(0==$ghost->token ){
+            $this->starting=false;
             $winner=(1==$this->player)?'红方':'黑方';
-            wb_message_box($this->mainwin, "游戏结束，$winner 胜",'游戏结束啦');
+            $res=wb_message_box($this->mainwin, "游戏结束，$winner 胜。".PHP_EOL."点击是保存棋谱，点击否重新开始",'游戏结束啦',WBC_YESNO);
+            if($res){
+                //@todo 保存棋谱
+            }else{
+                $this->restart();
+            }
+            return ;
         }
         $this->swich_player();
     }
 
     private function swich_player(){
+        $this->starting=true;
         $this->player=(1+$this->player)%2;
     }
     private function draw_rect($mainwin,$x,$y,$width,$height,$color){
         wb_draw_line($mainwin,$x,$y,$x+$width,$y,$color);
-        wb_draw_line($mainwin,$x,$y,$x,$y+$width,$color);
-        wb_draw_line($mainwin,$x+$width,$y,$x+$width,$y+$width,$color);
-        wb_draw_line($mainwin,$x,$y+$width,$x+$width,$y+$width,$color);
+        wb_draw_line($mainwin,$x,$y,$x,$y+$height,$color);
+        wb_draw_line($mainwin,$x+$width,$y,$x+$width,$y+$height,$color);
+        wb_draw_line($mainwin,$x,$y+$height,$x+$width,$y+$height,$color);
     }
 
     public function __get($property){
@@ -191,6 +207,42 @@ class map{
         }else{
             return NULL;
         }
+    }
+
+    public function add_log($chess,$from,$goto){
+        $x=array('九','八','七','六','五','四','三','二','一');
+        $y=array('1','2','3','4','5','6','7','8','9');
+        $start=($chess->color)?$x[$from[0]]:$y[$from[0]];
+        $end=($chess->color)?$x[$goto[0]]:$y[$goto[0]];
+        $end=($from[0]==$goto[0])?abs($from[1]-$goto[1]):$end;
+        if($from[1]==$goto[1]){
+            $action='平';
+        }elseif($from[1]>$goto[1]){
+            $action=($chess->color)?'进':'退';
+        }else{
+            $action=($chess->color)?'退':'进';
+        }
+        $discribe=$chess->name.$start.$action.$end;
+        $temp=($chess->color)?'后':'前';
+        for($i=0;$i<10;$i++){
+            if($i==$from[1]){
+                $temp=($chess->color)?'前':'后';
+                continue;
+            }
+            $target=$this->battleground[$from[0]][$i];
+            if($target instanceof chess && $chess->color==$target->color && $chess->token==$target->token ){
+                $discribe=$temp.$chess->name.$action.$end;
+                break;
+            }
+        }
+        $old=$this->battleground[$goto[0]][$goto[1]];
+        $log['chess']=(array)$chess;
+        $log['old']=($old instanceof chess)?(array)$old:$old;
+        $log['from']=$from;
+        $log['goto']=$goto;
+        $log['describe']=$discribe;
+        $this->log[]=$log;
+        echo iconv("UTF-8","GB2312",$log['describe'].PHP_EOL);
     }
 
 }

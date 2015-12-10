@@ -1,5 +1,6 @@
 <?php
 /**
+ * @todo  棋盘画的次数太多，内存溢出了
  * 熙宇的象棋游戏v1.0
  * 功能概要：
  * 1.在一台电脑上对局
@@ -15,14 +16,30 @@
  */
 
 define("PATH_RES","resources/");
+define("APP_NAME","熙雨的中国象棋");
 define("ID",0);
+define("ID_START",1);
+define("ID_SAVE",2);
+define("ID_ABOUT",3);
+define("ID_ABOUT",4);
+define("ID_OPEN",5);
 include_once "include/winbinder.php";
+include_once "map.class.php";
 
 //画窗口
 $win_width=1000;
-$win_heigh=700;
-$mainwin = wb_create_window(NULL, AppWindow, "xiyu's chiness chess", 0, 0, $win_width, $win_heigh, WBC_NOTIFY, WBC_DBLCLICK | WBC_MOUSEDOWN | WBC_MOUSEUP | WBC_MOUSEMOVE);
-include_once "map.class.php";
+$win_heigh=720;
+$mainwin = wb_create_window(NULL, AppWindow, APP_NAME, 300, 0, $win_width, $win_heigh, WBC_NOTIFY, WBC_DBLCLICK | WBC_MOUSEDOWN | WBC_MOUSEUP | WBC_MOUSEMOVE);
+wb_create_control($mainwin, Menu, array(
+    "&菜单",
+    array(ID_START,  "&开始/重玩\tCtrl+r", NULL, PATH_RES . "menu_edit.bmp", "Ctrl+r"),
+    array(ID_UNDO,  "&悔棋\tCtrl+z", NULL, PATH_RES . "menu_cancel.bmp", "Ctrl+z"),
+    null,           // Separator
+    array(ID_SAVE,  "&保存棋谱\tCtrl+s",    NULL, PATH_RES . "menu_save.bmp", "Ctrl+s"),
+    array(ID_OPEN,  "&打开棋谱\tCtrl+o",    NULL, PATH_RES . "menu_open.bmp", "Ctrl+o"),
+    "&帮助",
+    array(ID_ABOUT, "&关于...",        NULL, PATH_RES . "menu_help.bmp")
+));
 $statusbar = wb_create_control($mainwin, StatusBar, "");
 //$map_ctrl=wb_create_control($mainwin,Accel);
 $map=new map($mainwin);
@@ -30,6 +47,7 @@ $map=new map($mainwin);
 
 
 wb_set_handler($mainwin, "process_main");
+wb_set_image($mainwin, PATH_RES . "chess.ico");
 wb_set_text($statusbar,'hello wrod。。');
 
 wb_main_loop();
@@ -55,8 +73,17 @@ function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
 //            wb_set_text($statusbar, WBC_MOUSEDOWN."你当前的坐标是$x 。$y 。$lparam2 。$lparam 。$ctrl 。$id");
             //鼠标左键点击
             if($lparam==513){
-                $map->draw_map();
+//                $map->draw_map();   //@todo 最小化再最大化图片都会消失，怎么解决这个问题？
                 $map->click($x,$y);
+            }
+            break;
+        case ID_START:
+            if($map->starting) {
+                if(wb_message_box($window, '确定重新开始吗？', APP_NAME,WBC_YESNO)){
+                    $map->__construct($window);
+                }
+            }else{
+                $map->__construct($window);
             }
             break;
 
