@@ -7,9 +7,14 @@ class map{
     private $chosen_chess=0;
     private $chosen_location=array();
     private $log=array();
+    private $describe;   //中文版棋谱
+    private $step=0;    //回合数
     private $mainwin;
     private $player;    //走子方，0=>black，1=>read
+    private $player_name=array('黑方','红方');
     private $starting=false;
+    private $map_img;
+    private $created_chess=array();
 
     public function restart(){
         $this->chosen_chess=0;
@@ -17,99 +22,78 @@ class map{
         $this->starting=false;
         $this->__construct($this->mainwin);
     }
+
+    private function get_chess($color,$token){
+        if(isset($this->created_chess[$color.'_'.$token])){
+            return $this->created_chess[$color.'_'.$token];
+        }else{
+            $this->created_chess[$color.'_'.$token]=new chess($color,$token);
+            return $this->created_chess[$color.'_'.$token];
+        }
+    }
+
+    //@todo 重新执行构造函数多次，还是会导致图片加载次数过多，内存不足
     public function __construct($mainwin){
         global $win_heigh;
         global $win_width;
         $this->map_y_start=($win_heigh>600)?(($win_heigh-600)/3):0;
-        $this->map_x_start=($win_width>600)?(($win_width-600)/2):0;
+        $this->map_x_start=($win_width>600)?(($win_width-600)/2)-50:0;
         $this->mainwin=$mainwin;
         $this->player=1;
+        $this->step++;
+        $this->describe='第1回合:'.PHP_EOL;
         $this->battleground=array_fill(0,9,array_fill(0,10,0));
         //初始化棋子
-        $this->battleground[0][0]=new chess(0,4);
-        $this->battleground[1][0]=new chess(0,3);
-        $this->battleground[2][0]=new chess(0,2);
-        $this->battleground[3][0]=new chess(0,1);
-        $this->battleground[4][0]=new chess(0,0);
-        $this->battleground[5][0]=new chess(0,1);
-        $this->battleground[6][0]=new chess(0,2);
-        $this->battleground[7][0]=new chess(0,3);
-        $this->battleground[8][0]=new chess(0,4);
-        $this->battleground[1][2]=new chess(0,5);
-        $this->battleground[7][2]=new chess(0,5);
-        $this->battleground[0][3]=new chess(0,6);
-        $this->battleground[2][3]=new chess(0,6);
-        $this->battleground[4][3]=new chess(0,6);
-        $this->battleground[6][3]=new chess(0,6);
-        $this->battleground[8][3]=new chess(0,6);
-        $this->battleground[0][9]=new chess(1,4);
-        $this->battleground[1][9]=new chess(1,3);
-        $this->battleground[2][9]=new chess(1,2);
-        $this->battleground[3][9]=new chess(1,1);
-        $this->battleground[4][9]=new chess(1,0);
-        $this->battleground[5][9]=new chess(1,1);
-        $this->battleground[6][9]=new chess(1,2);
-        $this->battleground[7][9]=new chess(1,3);
-        $this->battleground[8][9]=new chess(1,4);
-        $this->battleground[1][7]=new chess(1,5);
-        $this->battleground[7][7]=new chess(1,5);
-        $this->battleground[0][6]=new chess(1,6);
-        $this->battleground[2][6]=new chess(1,6);
-        $this->battleground[4][6]=new chess(1,6);
-        $this->battleground[6][6]=new chess(1,6);
-        $this->battleground[8][6]=new chess(1,6);
+        $this->battleground[0][0]=$this->get_chess(0,4);
+        $this->battleground[1][0]=$this->get_chess(0,3);
+        $this->battleground[2][0]=$this->get_chess(0,2);
+        $this->battleground[3][0]=$this->get_chess(0,1);
+        $this->battleground[4][0]=$this->get_chess(0,0);
+        $this->battleground[5][0]=$this->get_chess(0,1);
+        $this->battleground[6][0]=$this->get_chess(0,2);
+        $this->battleground[7][0]=$this->get_chess(0,3);
+        $this->battleground[8][0]=$this->get_chess(0,4);
+        $this->battleground[1][2]=$this->get_chess(0,5);
+        $this->battleground[7][2]=$this->get_chess(0,5);
+        $this->battleground[0][3]=$this->get_chess(0,6);
+        $this->battleground[2][3]=$this->get_chess(0,6);
+        $this->battleground[4][3]=$this->get_chess(0,6);
+        $this->battleground[6][3]=$this->get_chess(0,6);
+        $this->battleground[8][3]=$this->get_chess(0,6);
+        $this->battleground[0][9]=$this->get_chess(1,4);
+        $this->battleground[1][9]=$this->get_chess(1,3);
+        $this->battleground[2][9]=$this->get_chess(1,2);
+        $this->battleground[3][9]=$this->get_chess(1,1);
+        $this->battleground[4][9]=$this->get_chess(1,0);
+        $this->battleground[5][9]=$this->get_chess(1,1);
+        $this->battleground[6][9]=$this->get_chess(1,2);
+        $this->battleground[7][9]=$this->get_chess(1,3);
+        $this->battleground[8][9]=$this->get_chess(1,4);
+        $this->battleground[1][7]=$this->get_chess(1,5);
+        $this->battleground[7][7]=$this->get_chess(1,5);
+        $this->battleground[0][6]=$this->get_chess(1,6);
+        $this->battleground[2][6]=$this->get_chess(1,6);
+        $this->battleground[4][6]=$this->get_chess(1,6);
+        $this->battleground[6][6]=$this->get_chess(1,6);
+        $this->battleground[8][6]=$this->get_chess(1,6);
+        if(!$this->map_img){
+            $this->map_img=wb_load_image(PATH_RES.'chessdesktop.bmp');
+        }
         $this->draw_map();
     }
 
     public function draw_map(){
         //1.画棋盘
-        $map_img=wb_load_image(PATH_RES.'chessdesktop.bmp');
-        wb_draw_image($this->mainwin,$map_img,$this->map_x_start,$this->map_y_start);
-        wb_destroy_image($map_img);
+        wb_draw_image($this->mainwin,$this->map_img,$this->map_x_start,$this->map_y_start);
         //2.画棋子
         foreach($this->battleground as $key1=>$value1){
             foreach($value1 as $key2=>$value2){
                 if($value2 instanceof chess){
-                    $chesses_img=wb_load_image(PATH_RES.$value2->image);
                     list($x,$y)=$this->get_coordinate($key1,$key2);
-                    wb_draw_image($this->mainwin,$chesses_img,$x,$y,40,40);
-                    wb_destroy_image($chesses_img);
+                    wb_draw_image($this->mainwin,$value2->image_resource,$x,$y,40,40);
                 }
             }
         }
-    }
-
-    private function get_coordinate($key1,$key2){
-        $return=array($this->map_x_start+18+59*$key1,$this->map_y_start+15+59*$key2);
-        return $return;
-    }
-
-    private function get_chess_by_coordinate($x,$y){
-        $i1=floor(($x-($this->map_x_start+18))/59);
-        $i2=ceil(($x-($this->map_x_start+18+40))/59);
-        if($i1!=$i2){
-            return 0;
-        }
-        $j1=floor(($y-($this->map_y_start+15))/59);
-        $j2=ceil(($y-($this->map_y_start+15+40))/59);
-        if($j1!=$j2){
-            return 0;
-        }
-        return $this->battleground[$i1][$j1];
-    }
-
-    private function get_near_location_by_coordinate($x,$y){
-        $i1=floor(($x-($this->map_x_start+18))/59);
-        $i2=ceil(($x-($this->map_x_start+18+40))/59);
-        if($i1!=$i2){
-            return 0;
-        }
-        $j1=floor(($y-($this->map_y_start+15))/59);
-        $j2=ceil(($y-($this->map_y_start+15+40))/59);
-        if($j1!=$j2){
-            return 0;
-        }
-        return array($i1,$j1);
     }
 
     public function click($x,$y){
@@ -148,12 +132,67 @@ class map{
         }
     }
 
+    /**
+     * 悔棋
+     */
+    public function undo(){
+        if(empty($this->log)){
+            return ;
+        }
+        $undo=array_pop($this->log);
+        $this->battleground[$undo['from'][0]][$undo['from'][1]]=$this->get_chess($undo['chess']['color'],$undo['chess']['token']);
+        if(is_array($undo['chess_old'])){
+            $chess_old=$this->get_chess($undo['chess_old']['color'],$undo['chess_old']['token']);
+        }else{
+            $chess_old=0;
+        }
+        $this->battleground[$undo['goto'][0]][$undo['goto'][1]]=$chess_old;
+        $this->swich_player(true);
+        $this->draw_map();
+        global $record_frame;
+        wb_set_text($record_frame,$this->describe);
+    }
+
+    private function get_coordinate($key1,$key2){
+        $return=array($this->map_x_start+18+59*$key1,$this->map_y_start+15+59*$key2);
+        return $return;
+    }
+
+    private function get_chess_by_coordinate($x,$y){
+        $i1=floor(($x-($this->map_x_start+18))/59);
+        $i2=ceil(($x-($this->map_x_start+18+40))/59);
+        if($i1!=$i2){
+            return 0;
+        }
+        $j1=floor(($y-($this->map_y_start+15))/59);
+        $j2=ceil(($y-($this->map_y_start+15+40))/59);
+        if($j1!=$j2){
+            return 0;
+        }
+        return $this->battleground[$i1][$j1];
+    }
+
+    private function get_near_location_by_coordinate($x,$y){
+        $i1=floor(($x-($this->map_x_start+18))/59);
+        $i2=ceil(($x-($this->map_x_start+18+40))/59);
+        if($i1!=$i2){
+            return 0;
+        }
+        $j1=floor(($y-($this->map_y_start+15))/59);
+        $j2=ceil(($y-($this->map_y_start+15+40))/59);
+        if($j1!=$j2){
+            return 0;
+        }
+        return array($i1,$j1);
+    }
+
     private function chose_chess($chess,$location){
         $this->draw_map();
         $this->chosen_chess = $chess;
         $this->chosen_location = $location;
         list($x_s, $y_s) = $this->get_coordinate($location[0], $location[1]);
-        $this->draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF);
+        wb_draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF,false,0,6);
+//        $this->draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF);
     }
 
     private function move_chess($location){
@@ -165,6 +204,10 @@ class map{
         $this->chosen_chess=0;
         $this->swich_player();
         $this->draw_map();
+        list($x_s, $y_s) = $this->get_coordinate($i_c,$j_c);
+        wb_draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF,false,0,6);
+        list($x_s, $y_s) = $this->get_coordinate($i,$j);
+        wb_draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF,false,0,6);
     }
 
     private function kill_chess($location){
@@ -176,9 +219,13 @@ class map{
         $this->battleground[$i][$j]=$this->chosen_chess;
         $this->chosen_chess=0;
         $this->draw_map();
+        list($x_s, $y_s) = $this->get_coordinate($i_c,$j_c);
+        wb_draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF,false,0,6);
+        list($x_s, $y_s) = $this->get_coordinate($i,$j);
+        wb_draw_rect($this->mainwin, $x_s, $y_s, 40, 40, 0x0000FF,false,0,6);
         if(0==$ghost->token ){
             $this->starting=false;
-            $winner=(1==$this->player)?'红方':'黑方';
+            $winner=$this->player_name[$this->player];
             $res=wb_message_box($this->mainwin, "游戏结束，$winner 胜。".PHP_EOL."点击是保存棋谱，点击否重新开始",'游戏结束啦',WBC_YESNO);
             if($res){
                 //@todo 保存棋谱
@@ -190,12 +237,27 @@ class map{
         $this->swich_player();
     }
 
-    private function swich_player(){
+    private function swich_player($is_undo=false){
         $this->starting=true;
         $this->player=(1+$this->player)%2;
+        if(1==$this->player && !$is_undo){
+            $this->step++;
+            $this->describe.='第'.$this->step.'回合:'.PHP_EOL;
+        }
+        if($is_undo) {
+            $describe = $this->describe;
+            $describe = explode(PHP_EOL, $describe);
+            array_pop($describe);
+            array_pop($describe);
+            if (0 == $this->player) {
+                $this->step--;
+                array_pop($describe);
+            }
+            $this->describe = implode(PHP_EOL,$describe).PHP_EOL;
+        }
     }
     private function draw_rect($mainwin,$x,$y,$width,$height,$color){
-        wb_draw_line($mainwin,$x,$y,$x+$width,$y,$color);
+        wb_draw_line($mainwin,$x,$y,$x+$width,$y,$color,false,1);
         wb_draw_line($mainwin,$x,$y,$x,$y+$height,$color);
         wb_draw_line($mainwin,$x+$width,$y,$x+$width,$y+$height,$color);
         wb_draw_line($mainwin,$x,$y+$height,$x+$width,$y+$height,$color);
@@ -209,7 +271,7 @@ class map{
         }
     }
 
-    public function add_log($chess,$from,$goto){
+    private function add_log($chess,$from,$goto){
         $x=array('九','八','七','六','五','四','三','二','一');
         $y=array('1','2','3','4','5','6','7','8','9');
         $start=($chess->color)?$x[$from[0]]:$y[$from[0]];
@@ -222,7 +284,7 @@ class map{
         }else{
             $action=($chess->color)?'退':'进';
         }
-        $discribe=$chess->name.$start.$action.$end;
+        $describe=$chess->name.$start.$action.$end;
         $temp=($chess->color)?'后':'前';
         for($i=0;$i<10;$i++){
             if($i==$from[1]){
@@ -231,18 +293,21 @@ class map{
             }
             $target=$this->battleground[$from[0]][$i];
             if($target instanceof chess && $chess->color==$target->color && $chess->token==$target->token ){
-                $discribe=$temp.$chess->name.$action.$end;
+                $describe=$temp.$chess->name.$action.$end;
                 break;
             }
         }
         $old=$this->battleground[$goto[0]][$goto[1]];
-        $log['chess']=(array)$chess;
-        $log['old']=($old instanceof chess)?(array)$old:$old;
+        $log['chess']=$chess->to_array();
+        $log['chess_old']=($old instanceof chess)?$old->to_array():$old;
         $log['from']=$from;
         $log['goto']=$goto;
-        $log['describe']=$discribe;
+        $log['describe']=$describe;
+        $this->describe.=$this->player_name[$this->player].':'.$describe.PHP_EOL;
         $this->log[]=$log;
-        echo iconv("UTF-8","GB2312",$log['describe'].PHP_EOL);
+        global $record_frame;
+        wb_set_text($record_frame,$this->describe);
+//        echo iconv("UTF-8","GB2312",$describe.PHP_EOL);
     }
 
 }

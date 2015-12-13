@@ -3,6 +3,7 @@ class chess{
     private $color; //0=>black，1=>read
     private $token;
     private $image;
+    private $image_resource;
     private $name;
     private $token_to_name=array(
         array(0=>'将',1=>'士',2=>'象',3=>'马',4=>'车',5=>'炮',6=>'卒'),
@@ -14,6 +15,7 @@ class chess{
         $this->token=$token;
         $this->image=$this->get_image_name();
         $this->name=$this->token_to_name[$color][$token];
+        $this->image_resource=wb_load_image(PATH_RES.$this->image);
     }
 
     private function get_image_name(){
@@ -336,6 +338,16 @@ class chess{
         }else{
             return NULL;
         }
+    }
+
+    /**
+     * 转换成数组
+     */
+    public function to_array(){
+        return array(
+            'color'=>$this->color,
+            'token'=>$this->token,
+        );
     }
 
 }

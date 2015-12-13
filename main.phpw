@@ -1,28 +1,33 @@
 <?php
 /**
- * @todo  棋盘画的次数太多，内存溢出了
  * 熙宇的象棋游戏v1.0
  * 功能概要：
  * 1.在一台电脑上对局
  * 2.具有完整的下棋功能，走子规则判断，吃子功能，悔棋功能，保存棋谱功能，播放棋谱功能。
  * 3.缩小后恢复，图像消失问题
- * 4.游戏结束时，弹框选择重玩还是保存棋谱。棋子不能再被操作
- * 5.菜单，重玩、悔棋、保存
- * 6.主窗口有悔棋按钮
+ * 4.游戏结束时，弹框选择重玩还是保存棋谱。棋子不能再被操作 @todo
+ * 5.菜单，重玩、悔棋、保存 @todo
+ * 6.主窗口有悔棋按钮 @todo
+ * 7.右侧有对局纪录
+ * 8.显示内存使用状况，参考animation.phpw foreign_function_tutorial.phpw leaks.phpw。显示时间，参考digiclock.phpw
+ * @todo 走子放所有棋子都不能移动时，棋局结束
  *
  * v2.0 加入两台电脑联网对战功能，聊天功能。
  *
  * v3.0 加入电脑陪玩功能
  */
 
+define("PATH_DIR",getcwd());
 define("PATH_RES","resources/");
 define("APP_NAME","熙雨的中国象棋");
 define("ID",0);
 define("ID_START",1);
 define("ID_SAVE",2);
 define("ID_ABOUT",3);
-define("ID_ABOUT",4);
+define("ID_UNDO",4);
 define("ID_OPEN",5);
+define("ID_RECORD",6);
+//define("ID_UNDO",7);
 include_once "include/winbinder.php";
 include_once "map.class.php";
 
@@ -32,15 +37,17 @@ $win_heigh=720;
 $mainwin = wb_create_window(NULL, AppWindow, APP_NAME, 300, 0, $win_width, $win_heigh, WBC_NOTIFY, WBC_DBLCLICK | WBC_MOUSEDOWN | WBC_MOUSEUP | WBC_MOUSEMOVE);
 wb_create_control($mainwin, Menu, array(
     "&菜单",
-    array(ID_START,  "&开始/重玩\tCtrl+r", NULL, PATH_RES . "menu_edit.bmp", "Ctrl+r"),
-    array(ID_UNDO,  "&悔棋\tCtrl+z", NULL, PATH_RES . "menu_cancel.bmp", "Ctrl+z"),
+    array(ID_START,  "&开始/重玩\tCtrl+R", NULL, PATH_RES . "menu_edit.bmp", "Ctrl+R"),
+    array(ID_UNDO,  "&悔棋\tCtrl+Z", NULL, PATH_RES . "menu_cancel.bmp", "Ctrl+Z"),
     null,           // Separator
-    array(ID_SAVE,  "&保存棋谱\tCtrl+s",    NULL, PATH_RES . "menu_save.bmp", "Ctrl+s"),
-    array(ID_OPEN,  "&打开棋谱\tCtrl+o",    NULL, PATH_RES . "menu_open.bmp", "Ctrl+o"),
+    array(ID_SAVE,  "&保存棋谱\tCtrl+S",    NULL, PATH_RES . "menu_save.bmp", "Ctrl+S"),
+    array(ID_OPEN,  "&打开棋谱\tCtrl+O",    NULL, PATH_RES . "menu_open.bmp", "Ctrl+O"),
     "&帮助",
     array(ID_ABOUT, "&关于...",        NULL, PATH_RES . "menu_help.bmp")
 ));
 $statusbar = wb_create_control($mainwin, StatusBar, "");
+
+$record_frame=draw_record_frame($mainwin);
 //$map_ctrl=wb_create_control($mainwin,Accel);
 $map=new map($mainwin);
 
@@ -52,6 +59,13 @@ wb_set_text($statusbar,'hello wrod。。');
 
 wb_main_loop();
 
+function draw_record_frame($mainwin){
+    global $win_heigh;
+    global $win_width;
+    $start_x=($win_width>600)?($win_width+600)/2-50:555;
+    $start_y=($win_heigh>600)?(($win_heigh-600)/3):0;
+    return wb_create_control($mainwin, EditBox, "", $start_x, $start_y, 222, 600, ID_RECORD, WBC_VISIBLE | WBC_ENABLED | WBC_MULTILINE | WBC_READONLY, 0, 3);
+}
 
 /**
  * @param $window
@@ -73,20 +87,27 @@ function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
 //            wb_set_text($statusbar, WBC_MOUSEDOWN."你当前的坐标是$x 。$y 。$lparam2 。$lparam 。$ctrl 。$id");
             //鼠标左键点击
             if($lparam==513){
-//                $map->draw_map();   //@todo 最小化再最大化图片都会消失，怎么解决这个问题？
+                $map->draw_map();   //@todo 最小化再最大化图片都会消失，怎么解决这个问题？
                 $map->click($x,$y);
             }
             break;
         case ID_START:
             if($map->starting) {
                 if(wb_message_box($window, '确定重新开始吗？', APP_NAME,WBC_YESNO)){
-                    $map->__construct($window);
+                    $map->restart();
                 }
             }else{
-                $map->__construct($window);
+                $map->restart();
             }
             break;
-
+        case ID_UNDO:
+            $map->undo();
+            break;
+        case ID_SAVE:
+            var_dump( __DIR__);
+            var_dump( __FILE__);
+            var_dump( getcwd());
+            break;
         case ID_EXIT:
         case IDCLOSE:
             wb_destroy_window($window);
