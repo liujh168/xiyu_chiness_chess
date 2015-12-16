@@ -23,19 +23,11 @@ class map{
         $this->__construct($this->mainwin);
     }
 
-    private function get_chess($color,$token){
-        if(isset($this->created_chess[$color.'_'.$token])){
-            return $this->created_chess[$color.'_'.$token];
-        }else{
-            $this->created_chess[$color.'_'.$token]=new chess($color,$token);
-            return $this->created_chess[$color.'_'.$token];
-        }
-    }
-
     //@todo 重新执行构造函数多次，还是会导致图片加载次数过多，内存不足
     public function __construct($mainwin){
         global $win_heigh;
         global $win_width;
+        global $record_frame;
         $this->map_y_start=($win_heigh>600)?(($win_heigh-600)/3):0;
         $this->map_x_start=($win_width>600)?(($win_width-600)/2)-50:0;
         $this->mainwin=$mainwin;
@@ -80,6 +72,7 @@ class map{
             $this->map_img=wb_load_image(PATH_RES.'chessdesktop.bmp');
         }
         $this->draw_map();
+        wb_set_text($record_frame,$this->describe);
     }
 
     public function draw_map(){
@@ -149,8 +142,36 @@ class map{
         $this->battleground[$undo['goto'][0]][$undo['goto'][1]]=$chess_old;
         $this->swich_player(true);
         $this->draw_map();
-        global $record_frame;
-        wb_set_text($record_frame,$this->describe);
+    }
+
+    /**
+     * 保存棋谱
+     */
+    public function save_game(){
+        $file_path= PATH_DATABASE.date ('Ymd_His',time()).'_'.(time()%10000).'.chess.log';
+        $log['machine']=$this->log;
+        $log['mankind']=$this->describe;    //给人类看的棋盘
+        $res=file_put_contents($file_path,json_encode($log));
+        if(false===$res){
+            return $res;
+        }
+        return $file_path;
+    }
+
+    public function __get($property){
+        if(isset($this->$property)){
+            return $this->$property;
+        }else{
+            return NULL;
+        }
+    }
+
+    private function get_chess($color,$token){
+        //懒汉式
+        if(!isset($this->created_chess[$color.'_'.$token])){
+            $this->created_chess[$color.'_'.$token]=new chess($color,$token);
+        }
+        return $this->created_chess[$color.'_'.$token];
     }
 
     private function get_coordinate($key1,$key2){
@@ -228,7 +249,15 @@ class map{
             $winner=$this->player_name[$this->player];
             $res=wb_message_box($this->mainwin, "游戏结束，$winner 胜。".PHP_EOL."点击是保存棋谱，点击否重新开始",'游戏结束啦',WBC_YESNO);
             if($res){
-                //@todo 保存棋谱
+                //保存棋盘
+                $return=$this->save_game();
+                if(false===$return){
+                    $message='保存失败!';
+                }else{
+                    $message='保存成功!'.PHP_EOL.'棋谱位置：'.$return;
+                }
+                $res=wb_message_box($window, $message.PHP_EOL."点击确定重新开始",'保存棋谱',WBC_INFO);
+                $this->restart();
             }else{
                 $this->restart();
             }
@@ -244,6 +273,7 @@ class map{
             $this->step++;
             $this->describe.='第'.$this->step.'回合:'.PHP_EOL;
         }
+
         if($is_undo) {
             $describe = $this->describe;
             $describe = explode(PHP_EOL, $describe);
@@ -261,14 +291,6 @@ class map{
         wb_draw_line($mainwin,$x,$y,$x,$y+$height,$color);
         wb_draw_line($mainwin,$x+$width,$y,$x+$width,$y+$height,$color);
         wb_draw_line($mainwin,$x,$y+$height,$x+$width,$y+$height,$color);
-    }
-
-    public function __get($property){
-        if(isset($this->$property)){
-            return $this->$property;
-        }else{
-            return NULL;
-        }
     }
 
     private function add_log($chess,$from,$goto){

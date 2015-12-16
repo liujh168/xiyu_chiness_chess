@@ -18,7 +18,8 @@
  */
 
 define("PATH_DIR",getcwd());
-define("PATH_RES","resources/");
+define("PATH_RES",PATH_DIR."\\resources\\");
+define("PATH_DATABASE",PATH_DIR."\\database\\");
 define("APP_NAME","熙雨的中国象棋");
 define("ID",0);
 define("ID_START",1);
@@ -28,6 +29,7 @@ define("ID_UNDO",4);
 define("ID_OPEN",5);
 define("ID_RECORD",6);
 //define("ID_UNDO",7);
+date_default_timezone_set('Asia/Chongqing');
 include_once "include/winbinder.php";
 include_once "map.class.php";
 
@@ -102,11 +104,20 @@ function process_main($window, $id, $ctrl=0, $lparam=0, $lparam2=0)
             break;
         case ID_UNDO:
             $map->undo();
+            global $record_frame;
+            wb_set_text($record_frame,$map->describe);
             break;
         case ID_SAVE:
-            var_dump( __DIR__);
-            var_dump( __FILE__);
-            var_dump( getcwd());
+            $return=$map->save_game();
+            if(false===$return){
+                $message='保存失败!';
+            }else{
+                $message='保存成功!'.PHP_EOL.'棋谱位置：'.$return;
+            }
+            $res=wb_message_box($window, $message.PHP_EOL."点击是重新开始，点击否继续游戏",'保存棋谱',WBC_YESNO);
+            if($res){
+                $map->restart();
+            }
             break;
         case ID_EXIT:
         case IDCLOSE:
