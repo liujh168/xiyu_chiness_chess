@@ -17,7 +17,7 @@
  * v3.0 加入电脑陪玩功能
  */
 
-define("PATH_DIR",getcwd());
+define("PATH_DIR",getcwd());var_dump( PATH_DIR);
 define("PATH_RES",PATH_DIR."\\resources\\");
 define("PATH_DATABASE",PATH_DIR."\\database\\");
 define("APP_NAME","熙雨的中国象棋");

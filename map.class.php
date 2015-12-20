@@ -148,14 +148,23 @@ class map{
      * 保存棋谱
      */
     public function save_game(){
-        $file_path= PATH_DATABASE.date ('Ymd_His',time()).'_'.(time()%10000).'.chess.log';
+        $file_name= date ('Ymd_His',time()).'_'.(time()%10000).'.chess.log';
         $log['machine']=$this->log;
         $log['mankind']=$this->describe;    //给人类看的棋盘
-        $res=file_put_contents($file_path,json_encode($log));
-        if(false===$res){
-            return $res;
+        $filename=wb_sys_dlg_save($this->mainwin, "保存棋谱...",
+            "棋谱文档 (*.chess.log)\0*.chess.log\0All files (*.*)\0*.*" . "\0\0",
+            PATH_DATABASE,$file_name);
+        if($filename){
+            $res=file_put_contents($filename,json_encode($log));
+            if(false===$res){
+                return $res;
+            }
+            return $filename;
+        }else {
+            return false;
         }
-        return $file_path;
+
+
     }
 
     public function __get($property){
