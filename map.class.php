@@ -148,14 +148,19 @@ class map{
      * 保存棋谱
      */
     public function save_game(){
-        $file_name= date ('Ymd_His',time()).'_'.(time()%10000).'.chess.log';
+        $file_name= date ('Ymd_His',time()).'_'.(time()%10000).LOG_TAIL;
         $log['machine']=$this->log;
         $log['mankind']=$this->describe;    //给人类看的棋盘
         $filename=wb_sys_dlg_save($this->mainwin, "保存棋谱...",
-            "棋谱文档 (*.chess.log)\0*.chess.log\0All files (*.*)\0*.*" . "\0\0",
+            "棋谱文档 (*".LOG_TAIL.")\0*".LOG_TAIL."\0All files (*.*)\0*.*" . "\0\0",
             PATH_DATABASE,$file_name);
         if($filename){
-            $res=file_put_contents($filename,json_encode($log));
+            if ($filename === iconv('UTF-8', 'UTF-8//IGNORE', $filename)) {
+                $put_filename=iconv("UTF-8","GBK",$filename);
+            }else{
+                $put_filename=$filename;
+            }
+            $res=file_put_contents($put_filename,json_encode($log));
             if(false===$res){
                 return $res;
             }
@@ -163,8 +168,6 @@ class map{
         }else {
             return false;
         }
-
-
     }
 
     public function __get($property){
@@ -258,14 +261,14 @@ class map{
             $winner=$this->player_name[$this->player];
             $res=wb_message_box($this->mainwin, "游戏结束，$winner 胜。".PHP_EOL."点击是保存棋谱，点击否重新开始",'游戏结束啦',WBC_YESNO);
             if($res){
-                //保存棋盘
+                //保存棋谱
                 $return=$this->save_game();
                 if(false===$return){
                     $message='保存失败!';
                 }else{
                     $message='保存成功!'.PHP_EOL.'棋谱位置：'.$return;
                 }
-                $res=wb_message_box($window, $message.PHP_EOL."点击确定重新开始",'保存棋谱',WBC_INFO);
+                $res=wb_message_box($this->mainwin, $message.PHP_EOL."点击确定重新开始",'保存棋谱',WBC_INFO);
                 $this->restart();
             }else{
                 $this->restart();

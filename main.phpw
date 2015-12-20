@@ -16,10 +16,10 @@
  *
  * v3.0 加入电脑陪玩功能
  */
-
-define("PATH_DIR",getcwd());var_dump( PATH_DIR);
-define("PATH_RES",PATH_DIR."\\resources\\");
-define("PATH_DATABASE",PATH_DIR."\\database\\");
+define("PATH_DIR",getcwd());
+define("PATH_RES","resources\\");
+define("PATH_DATABASE","database\\");
+define("LOG_TAIL",'.log.chess');
 define("APP_NAME","熙雨的中国象棋");
 define("ID",0);
 define("ID_START",1);
@@ -33,6 +33,16 @@ date_default_timezone_set('Asia/Chongqing');
 include_once "include/winbinder.php";
 include_once "map.class.php";
 
+function detect_encoding ($str) {
+    foreach (array('GBK', 'UTF-8') as $v) {
+        if ($str === iconv($v, $v . '//IGNORE', $str)) {
+            echo $v.PHP_EOL;
+//            return $v;
+        }else{
+            echo 'not '.$v.PHP_EOL;
+        }
+    }
+}
 //画窗口
 $win_width=1000;
 $win_heigh=720;
